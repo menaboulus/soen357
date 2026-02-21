@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HealthBuddy</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  :root {
+    --bg-dark: #1a2233;
+    --bg-card: #243047;
+    --bg-card2: #2d3a50;
+    --accent-orange: #f07b2b;
+    --accent-green: #3dd68c;
+    --accent-yellow: #f5c842;
+    --accent-blue: #4a90d9;
+    --text-primary: #e8edf5;
+    --text-secondary: #8fa3c0;
+    --border: #3a4a62;
+    --nav-h: 72px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #0f1520;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  .phone {
+    width: 375px;
+    height: 780px;
+    background: var(--bg-dark);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px #3a4a62;
+  }
+
+  /* Status Bar */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    flex-shrink: 0;
+  }
+
+  /* Screens */
+  .screen {
+    display: none;
+    flex-direction: column;
+    height: 100%;
+    animation: fadeIn 0.25s ease;
+  }
+  .screen.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .screen-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 20px 16px;
+    scrollbar-width: none;
+  }
+  .screen-content::-webkit-scrollbar { display: none; }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    height: var(--nav-h);
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 8px 8px;
+    flex-shrink: 0;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 8px 16px;
+    border-radius: 12px;
+    transition: background 0.2s;
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 500;
+    border: none;
+    background: transparent;
+  }
+  .nav-item:hover { background: var(--bg-card2); }
+  .nav-item.active { color: var(--text-primary); }
+  .nav-item .nav-icon { font-size: 22px; line-height: 1; }
+
+  /* ======== AUTH SCREEN ======== */
+  #screen-auth .screen-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    gap: 16px;
+  }
+
+  .app-logo {
+    width: 64px;
+    height: 64px;
+    background: var(--bg-card2);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 4px;
+  }
+
+  .app-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+  }
+
+  .input-field {
+    width: 100%;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 15px;
+    color: var(--text-primary);
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .input-field::placeholder { color: var(--text-secondary); }
+  .input-field:focus { border-color: var(--accent-orange); }
+
+  .remember-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+  .remember-row input[type="checkbox"] {
+    width: 18px; height: 18px;
+    accent-color: var(--accent-orange);
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 15px;
+    background: var(--accent-orange);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:active { transform: scale(0.98); }
+
+  .link-text {
+    color: var(--text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .link-text:hover { color: var(--text-primary); }
+
+  .btn-outline {
+    width: 100%;
+    padding: 15px;
+    background: transparent;
+    color: var(--text-primary);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--text-secondary); }
+
+  /* ======== HOME SCREEN ======== */
+  .screen-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px 12px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 5;
+  }
+  .screen-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .back-btn {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px 8px 4px;
+    border-radius: 10px;
+    position: relative;
+    z-index: 10;
+    pointer-events: all;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .back-btn:hover { background: var(--bg-card2); }
+  .back-btn:active { opacity: 0.7; }
+  .icon-btn {
+    width: 36px; height: 36px;
+    background: var(--bg-card2);
+    border-radius: 10px;
+    border: none;
+    color: var(--text-primary);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Med Card */
+  .med-card {
+    background: var(--bg-card2);
+    border-radius: 16px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: border-color 0.2s, transform 0.1s;
+  }
+  .med-card:hover { border-color: var(--border); transform: translateY(-1px); }
+  .med-card.taken { border-color: var(--accent-orange); background: rgba(240,123,43,0.12); }
+
+  .med-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .med-icon.orange { background: var(--accent-orange); }
+  .med-icon.gray { background: var(--bg-card); }
+
+  .med-info { flex: 1; }
+  .med-name { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+  .med-dose { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+
+  .med-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+  .med-time { font-size: 13px; font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+
+  .badge {
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .badge.taken { background: var(--accent-green); color: #0f1520; }
+  .badge.pending { background: var(--accent-yellow); color: #0f1520; }
+  .badge.upcoming { background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border); }
+  .badge.due { background: var(--accent-yellow); color: #0f1520; }
+
+  .appointment-card {
+    background: var(--bg-card2);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: transform 0.1s;
+    margin-bottom: 10px;
+  }
+  .appointment-card:hover { transform: translateY(-1px); }
+  .appt-icon {
+    width: 44px; height: 44px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .appt-info { flex: 1; }
+  .appt-title { font-size: 15px; font-weight: 600; color: var(--text-primary); }
+  .appt-sub { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+
+  /* ======== MED INFO SCREEN ======== */
+  .med-info-hero {
+    background: rgba(240,123,43,0.18);
+    border: 1.5px solid var(--accent-orange);
+    border-radius: 18px;
+    padding: 20px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .med-info-hero .med-icon { width: 52px; height: 52px; font-size: 24px; }
+  .hero-details h2 { font-size: 20px; font-weight: 700; color: var(--text-primary); }
+  .hero-details p { font-size: 13px; color: var(--text-secondary); margin-top: 3px; margin-bottom: 10px; }
+  .hero-bullets { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .hero-bullets li { font-size: 14px; color: var(--text-primary); display: flex; align-items: center; gap: 6px; }
+  .hero-bullets li::before { content: '•'; color: var(--accent-orange); font-size: 18px; }
+
+  .adherence-card {
+    background: var(--bg-card2);
+    border-radius: 16px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+  }
+  .adherence-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .adherence-label { font-size: 15px; color: var(--text-secondary); }
+  .adherence-value { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+  .progress-bar {
+    height: 6px;
+    background: var(--bg-card);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent-green);
+    border-radius: 4px;
+    transition: width 0.6s ease;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .btn-half {
+    flex: 1;
+    padding: 14px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .btn-half.dark { background: var(--bg-card2); color: var(--text-primary); border: 1px solid var(--border); }
+  .btn-half.dark:hover { border-color: var(--text-secondary); }
+  .btn-half.outline { background: transparent; color: var(--text-primary); border: 1.5px solid var(--border); }
+  .btn-half.outline:hover { border-color: var(--text-secondary); }
+
+  /* ======== CALENDAR ======== */
+  .calendar-grid {
+    background: var(--bg-card2);
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .cal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .cal-month { font-size: 18px; font-weight: 700; color: var(--text-primary); }
+  .cal-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+  .cal-weekday { text-align: center; font-size: 11px; color: var(--text-secondary); font-weight: 600; padding: 4px 0; }
+  .cal-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  .cal-day {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 6px 2px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-size: 14px;
+    color: var(--text-primary);
+    gap: 3px;
+  }
+  .cal-day:hover { background: var(--bg-card); }
+  .cal-day.today { background: var(--accent-yellow); color: #0f1520; font-weight: 700; border-radius: 50%; width: 32px; height: 32px; margin: auto; padding: 0; justify-content: center; }
+  .cal-day.empty { cursor: default; }
+  .dot-row { display: flex; gap: 2px; }
+  .dot { width: 4px; height: 4px; border-radius: 50%; }
+  .dot.green { background: var(--accent-green); }
+  .dot.yellow { background: var(--accent-yellow); }
+  .dot.orange { background: var(--accent-orange); }
+
+  /* ======== APPOINTMENTS ======== */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .tab {
+    padding: 8px 18px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: background 0.2s;
+  }
+  .tab.active { background: var(--accent-green); color: #0f1520; }
+  .tab:not(.active) { background: var(--bg-card2); color: var(--text-secondary); }
+
+  .appt-big-card {
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 12px;
+    cursor: pointer;
+  }
+  .appt-big-card.upcoming { background: rgba(61,214,140,0.18); border: 1.5px solid var(--accent-green); }
+  .appt-big-card.other { background: var(--bg-card2); border: 1.5px solid transparent; }
+
+  .appt-doc-row { display: flex; gap: 14px; align-items: center; margin-bottom: 12px; }
+  .doc-avatar {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+    background: rgba(61,214,140,0.25);
+  }
+  .doc-avatar.gray { background: var(--bg-card); }
+  .doc-name { font-size: 17px; font-weight: 700; color: var(--text-primary); }
+  .doc-specialty { font-size: 13px; color: var(--text-secondary); margin-top: 2px; }
+  .appt-detail { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text-primary); margin-bottom: 6px; }
+
+  /* ======== MEDS LIST ======== */
+  .section-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-secondary);
+    margin: 16px 0 10px;
+  }
+
+  /* Scrollbar */
+  .screen-content { scrollbar-width: none; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- ===== AUTH SCREEN ===== -->
+  <div class="screen active" id="screen-auth">
+    <div class="status-bar"><span>10:45</span><span>🔋</span></div>
+    <div class="screen-content" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;">
+      <div class="app-logo">💊</div>
+      <div class="app-title">HealthBuddy</div>
+      <input class="input-field" type="email" placeholder="Email">
+      <input class="input-field" type="password" placeholder="Password">
+      <div class="remember-row">
+        <input type="checkbox" id="rem" checked>
+        <label for="rem">Remember Me</label>
+      </div>
+      <button class="btn-primary" onclick="goTo('screen-home')">Log In</button>
+      <a class="link-text" onclick="goTo('screen-forgot')">Forgot Password?</a>
+      <button class="btn-outline" onclick="goTo('screen-home')">Create Account</button>
+    </div>
+    <!-- No bottom nav on auth -->
+  </div>
+
+  <!-- ===== HOME SCREEN ===== -->
+  <div class="screen" id="screen-home">
+    <div class="status-bar"><span>10:45</span><span>🔋</span></div>
+    <div class="screen-header">
+      <div class="screen-title">← Today's Schedule</div>
+      <button class="icon-btn">☰</button>
+    </div>
+    <div class="screen-content">
+      <div class="med-card taken" onclick="goTo('screen-med-info')">
+        <div class="med-icon orange">💊</div>
+        <div class="med-info">
+          <div class="med-name">Levothyroxine</div>
+          <div class="med-dose">1.88 mg (75 mcg)</div>
+        </div>
+        <div class="med-right">
+          <div class="med-time">8:00 AM</div>
+          <span class="badge taken">Taken</span>
+        </div>
+      </div>
+
+      <div class="med-card" onclick="goTo('screen-med-info')">
+        <div class="med-icon gray">💊</div>
+        <div class="med-info">
+          <div class="med-name">Lisinopril</div>
+          <div class="med-dose">2 pills (10 mg)</div>
+        </div>
+        <div class="med-right">
+          <div class="med-time">12:00 PM</div>
+          <span class="badge pending">Pending</span>
+        </div>
+      </div>
+
+      <div class="med-card" onclick="goTo('screen-med-info')">
+        <div class="med-icon gray">💊</div>
+        <div class="med-info">
+          <div class="med-name">Metformin</div>
+          <div class="med-dose">1 pill (500 mg)</div>
+        </div>
+        <div class="med-right">
+          <div class="med-time">6:00 PM</div>
+          <span class="badge upcoming">Upcoming</span>
+        </div>
+      </div>
+
+      <div class="appointment-card" onclick="goTo('screen-appointments')">
+        <div class="appt-icon">📅</div>
+        <div class="appt-info">
+          <div class="appt-title">Next Appointment</div>
+          <div class="appt-sub">Dr. Anderson · Feb 22</div>
+        </div>
+        <span style="color:var(--text-secondary);font-size:18px;">→</span>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item active" onclick="goTo('screen-home')"><span class="nav-icon">🏠</span>Home</button>
+      <button class="nav-item" onclick="goTo('screen-meds')"><span class="nav-icon">💊</span>Meds</button>
+      <button class="nav-item" onclick="goTo('screen-calendar')"><span class="nav-icon">📅</span>Calendar</button>
+      <button class="nav-item" onclick="goTo('screen-appointments')"><span class="nav-icon">👤</span>Profile</button>
+    </div>
+  </div>
+
+  <!-- ===== MED INFO SCREEN ===== -->
+  <div class="screen" id="screen-med-info">
+    <div class="status-bar"><span>10:46</span><span>🔋</span></div>
+    <div class="screen-header">
+      <button class="back-btn" onclick="goBack()">← Medication Info</button>
+      <button class="icon-btn">⋯</button>
+    </div>
+    <div class="screen-content">
+      <div class="med-info-hero">
+        <div class="med-icon orange" style="width:52px;height:52px;font-size:24px;border-radius:14px;">💊</div>
+        <div class="hero-details">
+          <h2>Levothyroxine</h2>
+          <p>1.88 mg · Daily</p>
+          <ul class="hero-bullets">
+            <li>Morning: 8:00 AM</li>
+            <li>Take before breakfast</li>
+            <li>With water only</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="adherence-card">
+        <div class="adherence-row">
+          <span class="adherence-label">Weekly Adherence</span>
+          <span class="adherence-value">92%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 92%"></div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-half dark" onclick="alert('Opening Edit Details...')">Edit Details</button>
+        <button class="btn-half outline" onclick="goTo('screen-history')">View History</button>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="goTo('screen-home')"><span class="nav-icon">🏠</span>Home</button>
+      <button class="nav-item active" onclick="goTo('screen-meds')"><span class="nav-icon">💊</span>Meds</button>
+      <button class="nav-item" onclick="goTo('screen-calendar')"><span class="nav-icon">📅</span>Calendar</button>
+      <button class="nav-item" onclick="goTo('screen-appointments')"><span class="nav-icon">👤</span>Profile</button>
+    </div>
+  </div>
+
+  <!-- ===== MEDS LIST SCREEN ===== -->
+  <div class="screen" id="screen-meds">
+    <div class="status-bar"><span>10:45</span><span>🔋</span></div>
+    <div class="screen-header">
+      <div class="screen-title">My Medications</div>
+      <button class="icon-btn" onclick="alert('Add medication')">+</button>
+    </div>
+    <div class="screen-content">
+      <div class="section-label">Active</div>
+      <div class="med-card" onclick="goTo('screen-med-info')">
+        <div class="med-icon orange">💊</div>
+        <div class="med-info">
+          <div class="med-name">Levothyroxine</div>
+          <div class="med-dose">1.88 mg · Daily · 8:00 AM</div>
+        </div>
+        <span style="color:var(--text-secondary);">›</span>
+      </div>
+      <div class="med-card" onclick="goTo('screen-med-info')">
+        <div class="med-icon gray">💊</div>
+        <div class="med-info">
+          <div class="med-name">Lisinopril</div>
+          <div class="med-dose">10 mg · Daily · 12:00 PM</div>
+        </div>
+        <span style="color:var(--text-secondary);">›</span>
+      </div>
+      <div class="med-card" onclick="goTo('screen-med-info')">
+        <div class="med-icon gray">💊</div>
+        <div class="med-info">
+          <div class="med-name">Metformin</div>
+          <div class="med-dose">500 mg · Daily · 6:00 PM</div>
+        </div>
+        <span style="color:var(--text-secondary);">›</span>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="goTo('screen-home')"><span class="nav-icon">🏠</span>Home</button>
+      <button class="nav-item active" onclick="goTo('screen-meds')"><span class="nav-icon">💊</span>Meds</button>
+      <button class="nav-item" onclick="goTo('screen-calendar')"><span class="nav-icon">📅</span>Calendar</button>
+      <button class="nav-item" onclick="goTo('screen-appointments')"><span class="nav-icon">👤</span>Profile</button>
+    </div>
+  </div>
+
+  <!-- ===== CALENDAR SCREEN ===== -->
+  <div class="screen" id="screen-calendar">
+    <div class="status-bar"><span>10:47</span><span>🔋</span></div>
+    <div class="screen-header">
+      <button class="back-btn" onclick="goBack()">←</button>
+      <div class="screen-title">February 2026</div>
+      <button class="icon-btn">⋯</button>
+    </div>
+    <div class="screen-content">
+      <div class="calendar-grid">
+        <div class="cal-weekdays">
+          <div class="cal-weekday">S</div><div class="cal-weekday">M</div><div class="cal-weekday">T</div>
+          <div class="cal-weekday">W</div><div class="cal-weekday">T</div><div class="cal-weekday">F</div><div class="cal-weekday">S</div>
+        </div>
+        <div class="cal-days" id="cal-days"></div>
+      </div>
+
+      <div class="section-label">Today's Medications</div>
+      <div class="med-card taken" onclick="goTo('screen-med-info')">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--accent-green);flex-shrink:0;"></div>
+        <div class="med-info">
+          <div class="med-name">Levothyroxine</div>
+          <div class="med-dose">8:00 AM</div>
+        </div>
+        <span class="badge taken">Taken</span>
+      </div>
+      <div class="med-card" onclick="goTo('screen-med-info')">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--accent-yellow);flex-shrink:0;"></div>
+        <div class="med-info">
+          <div class="med-name">Lisinopril</div>
+          <div class="med-dose">12:00 PM</div>
+        </div>
+        <span class="badge due">Due</span>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="goTo('screen-home')"><span class="nav-icon">🏠</span>Home</button>
+      <button class="nav-item" onclick="goTo('screen-meds')"><span class="nav-icon">💊</span>Meds</button>
+      <button class="nav-item active" onclick="goTo('screen-calendar')"><span class="nav-icon">📅</span>Calendar</button>
+      <button class="nav-item" onclick="goTo('screen-appointments')"><span class="nav-icon">👤</span>Profile</button>
+    </div>
+  </div>
+
+  <!-- ===== APPOINTMENTS SCREEN ===== -->
+  <div class="screen" id="screen-appointments">
+    <div class="status-bar"><span>10:48</span><span>🔋</span></div>
+    <div class="screen-header">
+      <button class="back-btn" onclick="goBack()">← Appointments</button>
+      <button class="icon-btn">⋯</button>
+    </div>
+    <div class="screen-content">
+      <div class="tabs">
+        <button class="tab active">Upcoming</button>
+        <button class="tab" onclick="alert('No history yet')">History</button>
+        <button class="tab" onclick="alert('No past appointments')">Past</button>
+      </div>
+
+      <div class="appt-big-card upcoming">
+        <div class="appt-doc-row">
+          <div class="doc-avatar">👨‍⚕️</div>
+          <div>
+            <div class="doc-name">Dr. Anderson</div>
+            <div class="doc-specialty">General Practitioner</div>
+          </div>
+        </div>
+        <div class="appt-detail">📅 Thursday, February 22</div>
+        <div class="appt-detail">⏰ 10:30 AM – 11:00 AM</div>
+        <div class="appt-detail">📍 Main Street Clinic</div>
+      </div>
+
+      <div class="appt-big-card other">
+        <div class="appt-doc-row">
+          <div class="doc-avatar gray">👩‍⚕️</div>
+          <div>
+            <div class="doc-name">Dr. Martinez</div>
+            <div class="doc-specialty">Endocrinologist</div>
+          </div>
+        </div>
+        <div class="appt-detail">📅 Monday, March 4</div>
+      </div>
+
+      <button class="btn-outline" style="margin-top:12px;color:#e05555;border-color:#e05555;width:100%;padding:14px;border-radius:14px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;background:transparent;" onclick="logout()">🚪 Log Out</button>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="goTo('screen-home')"><span class="nav-icon">🏠</span>Home</button>
+      <button class="nav-item" onclick="goTo('screen-meds')"><span class="nav-icon">💊</span>Meds</button>
+      <button class="nav-item" onclick="goTo('screen-calendar')"><span class="nav-icon">📅</span>Calendar</button>
+      <button class="nav-item active" onclick="goTo('screen-appointments')"><span class="nav-icon">👤</span>Profile</button>
+    </div>
+  </div>
+
+  <!-- ===== HISTORY SCREEN ===== -->
+  <div class="screen" id="screen-history">
+    <div class="status-bar"><span>10:47</span><span>🔋</span></div>
+    <div class="screen-header">
+      <button class="back-btn" onclick="goBack()">← History</button>
+    </div>
+    <div class="screen-content">
+      <div class="section-label">This Week</div>
+      <div class="med-card taken">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--accent-green);flex-shrink:0;"></div>
+        <div class="med-info"><div class="med-name">Feb 20 – 8:00 AM</div><div class="med-dose">Levothyroxine 1.88 mg</div></div>
+        <span class="badge taken">Taken</span>
+      </div>
+      <div class="med-card">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--accent-green);flex-shrink:0;"></div>
+        <div class="med-info"><div class="med-name">Feb 19 – 8:00 AM</div><div class="med-dose">Levothyroxine 1.88 mg</div></div>
+        <span class="badge taken">Taken</span>
+      </div>
+      <div class="med-card">
+        <div style="width:10px;height:10px;border-radius:50%;background:var(--accent-green);flex-shrink:0;"></div>
+        <div class="med-info"><div class="med-name">Feb 18 – 8:00 AM</div><div class="med-dose">Levothyroxine 1.88 mg</div></div>
+        <span class="badge taken">Taken</span>
+      </div>
+    </div>
+    <div class="bottom-nav">
+      <button class="nav-item" onclick="goTo('screen-home')"><span class="nav-icon">🏠</span>Home</button>
+      <button class="nav-item active" onclick="goTo('screen-meds')"><span class="nav-icon">💊</span>Meds</button>
+      <button class="nav-item" onclick="goTo('screen-calendar')"><span class="nav-icon">📅</span>Calendar</button>
+      <button class="nav-item" onclick="goTo('screen-appointments')"><span class="nav-icon">👤</span>Profile</button>
+    </div>
+  </div>
+
+  <!-- ===== FORGOT PASSWORD SCREEN ===== -->
+  <div class="screen" id="screen-forgot">
+    <div class="status-bar"><span>10:45</span><span>🔋</span></div>
+    <div class="screen-header">
+      <button class="back-btn" onclick="goBack()">←</button>
+    </div>
+    <div class="screen-content" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;">
+      <div class="app-logo">🔐</div>
+      <div class="app-title" style="font-size:20px;">Reset Password</div>
+      <p style="color:var(--text-secondary);font-size:14px;text-align:center;">Enter your email and we'll send you a reset link.</p>
+      <input class="input-field" type="email" placeholder="Email">
+      <button class="btn-primary" onclick="alert('Reset link sent!');goTo('screen-auth')">Send Reset Link</button>
+      <a class="link-text" onclick="goBack()">Back to Login</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const navHistory = [];
+  
+  function goTo(screenId) {
+    const current = document.querySelector('.screen.active');
+    if (current) {
+      navHistory.push(current.id);
+      current.classList.remove('active');
+    }
+    const next = document.getElementById(screenId);
+    if (next) next.classList.add('active');
+  }
+
+  function logout() {
+    navHistory.length = 0;
+    const current = document.querySelector('.screen.active');
+    if (current) current.classList.remove('active');
+    document.getElementById('screen-auth').classList.add('active');
+  }
+
+  function goBack() {
+    if (navHistory.length === 0) return;
+    const prev = navHistory.pop();
+    const current = document.querySelector('.screen.active');
+    if (current) current.classList.remove('active');
+    const target = document.getElementById(prev);
+    if (target) target.classList.add('active');
+  }
+
+  // Build calendar
+  function buildCalendar() {
+    const container = document.getElementById('cal-days');
+    if (!container) return;
+    // Feb 2026 starts on Sunday = index 0
+    const startDay = 0;
+    const daysInMonth = 28;
+    
+    // Dates with dots
+    const dotMap = {
+      5: ['green','orange'], 6: ['green','yellow'], 7: ['orange'],
+      12: ['green','yellow','orange'], 13: ['green','orange'], 14: ['yellow'],
+      19: ['orange','yellow'], 20: ['green','yellow'], 21: ['orange'],
+    };
+
+    for (let i = 0; i < startDay; i++) {
+      const empty = document.createElement('div');
+      empty.className = 'cal-day empty';
+      container.appendChild(empty);
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const el = document.createElement('div');
+      if (d === 19) {
+        el.className = 'cal-day today';
+        el.textContent = d;
+      } else {
+        el.className = 'cal-day';
+        const num = document.createElement('span');
+        num.textContent = d;
+        el.appendChild(num);
+        if (dotMap[d]) {
+          const row = document.createElement('div');
+          row.className = 'dot-row';
+          dotMap[d].forEach(c => {
+            const dot = document.createElement('div');
+            dot.className = `dot ${c}`;
+            row.appendChild(dot);
+          });
+          el.appendChild(row);
+        }
+      }
+      el.onclick = () => {};
+      container.appendChild(el);
+    }
+  }
+
+  buildCalendar();
+</script>
+</body>
+</html>
